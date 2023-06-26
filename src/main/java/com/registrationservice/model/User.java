@@ -1,4 +1,4 @@
-package com.registrationservice.registrationservice.model;
+package com.registrationservice.model;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -21,6 +21,7 @@ public class User {
     @Column(name = "password")
     private String password;
     @Column(name = "status")
+    @Enumerated(EnumType.STRING)
     private Status status;
     @Column(name = "role")
     private String role;
@@ -30,4 +31,13 @@ public class User {
     @LastModifiedDate
     @Column(name = "date_decision")
     private Date dateDecision;
+
+    public User(String email, String password, Status status, String role, Date dateRequest, Date dateDecision) {
+        this.email = email;
+        this.password = password;
+        this.status = status;
+        this.role = role;
+        this.dateRequest = dateRequest;
+        this.dateDecision = dateDecision;
+    }
 }
