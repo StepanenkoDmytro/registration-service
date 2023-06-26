@@ -1,10 +1,11 @@
 package com.registrationservice.rest;
 
 import com.registrationservice.dto.AuthRequestDto;
+import com.registrationservice.dto.RequestDto;
 import com.registrationservice.model.Request;
-import com.registrationservice.model.Status;
-import com.registrationservice.repository.RequestRepository;
+import com.registrationservice.model.Decision;
 import com.registrationservice.security.TemporaryTokenService;
+import com.registrationservice.service.RegistrationRequestsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,12 +17,12 @@ import java.util.Date;
 @RequestMapping("/registration")
 public class RegistrationRestController {
     private final TemporaryTokenService tokenService;
-    private final RequestRepository requestRepository;
+    private final RegistrationRequestsService requestsService;
 
     @Autowired
-    public RegistrationRestController(TemporaryTokenService tokenService, RequestRepository requestRepository) {
+    public RegistrationRestController(TemporaryTokenService tokenService, RegistrationRequestsService requestsService) {
         this.tokenService = tokenService;
-        this.requestRepository = requestRepository;
+        this.requestsService = requestsService;
     }
 
     @PostMapping("/registration")
@@ -35,17 +36,17 @@ public class RegistrationRestController {
                 newRequest.getUserEmail(),
                 newRequest.getPassword(),
                 newRequest.getRegistrationToken(),
-                Status.WAITING,
+                Decision.WAITING,
                 new Date());
 
-        requestRepository.save(request);
+        requestsService.saveRequest(request);
         return ResponseEntity.ok(request);
     }
 
     @GetMapping("{registrationToken}")
-    public ResponseEntity checkDecision(@PathVariable String registrationToken) {
+    public ResponseEntity<RequestDto> checkDecision(@PathVariable String registrationToken) {
         //Need create
-        System.out.println(registrationToken);
-        return ResponseEntity.ok().body(HttpStatus.OK);
+        RequestDto requestDto = requestsService.getByRegistrationToken(registrationToken);
+        return ResponseEntity.ok(requestDto);
     }
 }

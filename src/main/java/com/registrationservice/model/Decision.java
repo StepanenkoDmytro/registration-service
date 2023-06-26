@@ -1,5 +1,5 @@
 package com.registrationservice.model;
 
-public enum Status {
+public enum Decision {
     ACCEPT, WAITING, DECLINE
 }

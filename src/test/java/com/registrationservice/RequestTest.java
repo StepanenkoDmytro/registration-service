@@ -1,7 +1,7 @@
 package com.registrationservice;
 
 import com.registrationservice.model.Request;
-import com.registrationservice.model.Status;
+import com.registrationservice.model.Decision;
 import com.registrationservice.repository.RequestRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,15 +13,15 @@ import java.util.Optional;
 @SpringBootTest
 public class RequestTest {
     @Autowired
-    private RequestRepository requestRepository;
+    private RequestRepository registrationRequestsService;
 
     @Test
     void saveTest() {
-        Request request = new Request("test@test.com", "123", "5DjXdt1BWxQ4my1t7LKF0U87", Status.WAITING, new Date());
+        Request request = new Request("test@test.com", "123", "5DjXdt1BWxQ4my1t7LKF0U87", Decision.WAITING, new Date());
         //5DjXdt1BWxQ4my1t7LKF0U87
-        requestRepository.save(request);
+        registrationRequestsService.save(request);
 
-        Optional<Request> byRegistrationToken = requestRepository.findByRegistrationToken("5DjXdt1BWxQ4my1t7LKF0U87");
+        Optional<Request> byRegistrationToken = registrationRequestsService.findByRegistrationToken("5DjXdt1BWxQ4my1t7LKF0U87");
         System.out.println(byRegistrationToken);
     }
 }

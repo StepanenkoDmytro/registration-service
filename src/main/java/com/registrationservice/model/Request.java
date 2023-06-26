@@ -22,9 +22,9 @@ public class Request {
     private String password;
     @Column(name = "registration_token")
     private String registrationToken;
-    @Column(name = "status")
+    @Column(name = "decision")
     @Enumerated(EnumType.STRING)
-    private Status status;
+    private Decision decision;
     @CreatedDate
     @Column(name = "date_request")
     private Date dateRequest;
@@ -32,11 +32,11 @@ public class Request {
     @Column(name = "date_decision")
     private Date dateDecision;
 
-    public Request(String email, String password, String registrationToken, Status status, Date dateRequest) {
+    public Request(String email, String password, String registrationToken, Decision decision, Date dateRequest) {
         this.email = email;
         this.password = password;
         this.registrationToken = registrationToken;
-        this.status = status;
+        this.decision = decision;
         this.dateRequest = dateRequest;
     }
 }
