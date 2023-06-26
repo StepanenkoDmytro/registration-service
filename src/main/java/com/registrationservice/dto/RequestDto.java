@@ -20,7 +20,7 @@ public class RequestDto {
                 request.getRegistrationToken(),
                 request.getDateRequest(),
                 request.getEmail(),
-                request.getStatus().toString(),
+                request.getDecision().name(),
                 request.getDateDecision()
         );
     }

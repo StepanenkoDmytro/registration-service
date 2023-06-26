@@ -24,7 +24,8 @@ public class User {
     @Enumerated(EnumType.STRING)
     private Decision status;
     @Column(name = "role")
-    private String role;
+    @Enumerated(EnumType.STRING)
+    private Role role;
     @CreatedDate
     @Column(name = "date_request")
     private Date dateRequest;
@@ -32,7 +33,7 @@ public class User {
     @Column(name = "date_decision")
     private Date dateDecision;
 
-    public User(String email, String password, Decision status, String role, Date dateRequest, Date dateDecision) {
+    public User(String email, String password, Decision status, Role role, Date dateRequest, Date dateDecision) {
         this.email = email;
         this.password = password;
         this.status = status;
