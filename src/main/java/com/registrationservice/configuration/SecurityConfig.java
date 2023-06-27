@@ -1,7 +1,6 @@
 package com.registrationservice.configuration;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -19,9 +18,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
+    private static final String REGISTRATION_ENDPOINT = "/registration/**";
+    private static final String H2_CONSOLE_ENDPOINT = "/h2-console/**";
+    private static final String AUTH_ENDPOINT = "/login";
     private final UserDetailsService userDetailsService;
     @Autowired
-    public SecurityConfig(@Qualifier("userDetailsServiceImpl") UserDetailsService userDetailsService){
+    public SecurityConfig(UserDetailsService userDetailsService){
         this.userDetailsService = userDetailsService;
     }
 
@@ -35,10 +37,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http
                 .csrf().disable()
                 .authorizeRequests()
-                .antMatchers("/h2-console").permitAll()
-                .antMatchers("/registration/**", "/login").permitAll()
+                .antMatchers(REGISTRATION_ENDPOINT, AUTH_ENDPOINT,H2_CONSOLE_ENDPOINT).permitAll()
                 .anyRequest()
-                .authenticated();
+                .authenticated()
+                .and()
+                .headers().frameOptions().sameOrigin();
     }
 
     @Override

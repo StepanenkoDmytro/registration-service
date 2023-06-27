@@ -32,6 +32,7 @@ public class AuthRestController {
             SecurityContextHolder.getContext().setAuthentication(authenticate);
             return ResponseEntity.ok().build();
         }
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
     }
 }

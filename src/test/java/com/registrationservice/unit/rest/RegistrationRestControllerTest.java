@@ -2,7 +2,6 @@ package com.registrationservice.unit.rest;
 
 import com.registrationservice.dto.RequestDto;
 import com.registrationservice.dto.SignUpDto;
-import com.registrationservice.model.request.Request;
 import com.registrationservice.rest.RegistrationRestController;
 import com.registrationservice.service.RegistrationRequestsService;
 import com.registrationservice.service.TemporaryTokenService;
@@ -18,7 +17,7 @@ import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
-public class RegistrationRestControllerTest {
+class RegistrationRestControllerTest {
     @Mock
     private TemporaryTokenService tokenService;
     @Mock
