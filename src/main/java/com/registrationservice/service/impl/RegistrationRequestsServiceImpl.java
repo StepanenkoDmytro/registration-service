@@ -36,13 +36,13 @@ public class RegistrationRequestsServiceImpl implements RegistrationRequestsServ
     }
 
     @Override
-    public RequestDto getByRegistrationToken(String token) {
+    public Request getByRegistrationToken(String token) {
         Optional<Request> viewer = requestRepository.findByRegistrationToken(token);
         if (viewer.isEmpty()) {
             throw new RuntimeException("token is invalid");
         }
 
-        return RequestDto.mapRequest(viewer.get());
+        return viewer.get();
     }
 
     @Override

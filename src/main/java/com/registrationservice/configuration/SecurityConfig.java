@@ -19,9 +19,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
-//    private static final String AUTH_ENDPOINT = "/registration/**";
-    private static final String SIGNIN_ENDPOINT = "/login*";
-    private static final String ADMIN_ENDPOINT = "/registration/**";
     private final UserDetailsService userDetailsService;
     @Autowired
     public SecurityConfig(@Qualifier("userDetailsServiceImpl") UserDetailsService userDetailsService){
@@ -38,15 +35,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http
                 .csrf().disable()
                 .authorizeRequests()
-                .antMatchers(SIGNIN_ENDPOINT).permitAll()
-                .antMatchers(ADMIN_ENDPOINT).hasRole("ADMIN")
+                .antMatchers("/h2-console").permitAll()
+                .antMatchers("/registration/**", "/login").permitAll()
                 .anyRequest()
                 .authenticated();
-//                .and()
-//                .logout()
-//                .invalidateHttpSession(true)
-//                .clearAuthentication(true)
-//                .deleteCookies("JSESSIONID");
     }
 
     @Override

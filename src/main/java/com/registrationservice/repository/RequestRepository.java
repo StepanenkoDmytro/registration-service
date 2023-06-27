@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface RequestRepository extends JpaRepository<Request, Long> {
-    @Query("SELECT u FROM User u WHERE u.status = 'WAITING'")
+    @Query("SELECT r FROM Request r WHERE r.decision = 'WAITING'")
     List<Request> findByStatusWaiting();
     Optional<Request> findByRegistrationToken(String token);
 }

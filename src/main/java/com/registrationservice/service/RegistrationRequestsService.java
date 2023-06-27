@@ -8,6 +8,6 @@ import java.util.List;
 public interface RegistrationRequestsService {
     List<RequestDto> getAll();
     List<RequestDto> getAllByStatusWaiting();
-    RequestDto getByRegistrationToken(String token);
+    Request getByRegistrationToken(String token);
     void saveRequest(Request request);
 }
