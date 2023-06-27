@@ -1,10 +1,7 @@
 package com.registrationservice.service;
 
-import com.registrationservice.model.User;
-
-import java.util.Optional;
+import com.registrationservice.model.user.User;
 
 public interface UserService {
-    User getUserByEmail(String email);
     void userRegistration(User user);
 }

@@ -1,7 +1,7 @@
 package com.registrationservice.security;
 
 
-import com.registrationservice.model.User;
+import com.registrationservice.model.user.User;
 import com.registrationservice.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;

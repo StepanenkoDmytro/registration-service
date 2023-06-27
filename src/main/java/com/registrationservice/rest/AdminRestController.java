@@ -1,25 +1,21 @@
 package com.registrationservice.rest;
 
+import com.registrationservice.dto.RegistrationTokenResponse;
 import com.registrationservice.dto.RequestDto;
-import com.registrationservice.model.Decision;
-import com.registrationservice.model.Request;
-import com.registrationservice.model.Role;
-import com.registrationservice.model.User;
-import com.registrationservice.repository.UserRepository;
-import com.registrationservice.security.TemporaryTokenService;
+import com.registrationservice.model.request.Decision;
+import com.registrationservice.model.request.Request;
+import com.registrationservice.model.user.User;
+import com.registrationservice.service.TemporaryTokenService;
 import com.registrationservice.service.RegistrationRequestsService;
 import com.registrationservice.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/registration")
@@ -38,24 +34,17 @@ public class AdminRestController {
 
     @PostMapping("/requests")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity createRegistrationToken(@AuthenticationPrincipal UserDetails userDetails) {
-        //Need refactor
-        if(userDetails != null) {
-            String username = userDetails.getUsername();
-            User user = userService.getUserByEmail(username);
-//            System.out.println(user);
-        }
+    public ResponseEntity<RegistrationTokenResponse> createRegistrationToken() {
         String temporaryToken = tokenService.createToken();
 
-        Map<String, String> responseBody = new HashMap<>();
-        responseBody.put("registrationToken", temporaryToken);
+        RegistrationTokenResponse response = new RegistrationTokenResponse(temporaryToken);
 
-        return ResponseEntity.ok().body(responseBody);
+        return ResponseEntity.ok().body(response);
     }
 
     @GetMapping("/requests")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity<List<RequestDto>> getAllRequests() {
+    public ResponseEntity<List<RequestDto>> getWaitingRequests() {
         List<RequestDto> allRegistrationRequests = registrationService.getAllByStatusWaiting();
         return ResponseEntity.ok(allRegistrationRequests);
     }
@@ -67,37 +56,54 @@ public class AdminRestController {
         return ResponseEntity.ok(allRegistrationRequests);
     }
 
+    @GetMapping("/requests/{registrationToken}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<RequestDto> getRequest(@PathVariable String registrationToken) {
+        Optional<Request> request = registrationService.getByRegistrationToken(registrationToken);
+        if(request.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        RequestDto requestDto = RequestDto.mapRequest(request.get());
+        return ResponseEntity.ok(requestDto);
+    }
+
     @PutMapping("/requests/{registrationToken}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<RequestDto> acceptRequest(@PathVariable String registrationToken) {
-        Date currentDate = new Date();
-        Request request = registrationService.getByRegistrationToken(registrationToken);
+        Optional<Request> optional = registrationService.getByRegistrationToken(registrationToken);
+        if(optional.isEmpty() || optional.get().isDecisionMade()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        Request request = optional.get();
         request.setDecision(Decision.ACCEPT);
-        request.setDateDecision(currentDate);
-        User user = new User(
-                request.getEmail(),
-                request.getPassword(),
-                Decision.ACCEPT,
-                Role.ROLE_USER,
-                request.getDateRequest(),
-                currentDate
-        );
+        request.setDateDecision(new Date());
+
+        User user = User.mapToUser(request);
+
         registrationService.saveRequest(request);
         userService.userRegistration(user);
-        return ResponseEntity.ok(RequestDto.mapRequest(request));
+
+        RequestDto requestDto = RequestDto.mapRequest(request);
+        return ResponseEntity.ok(requestDto);
     }
 
     @DeleteMapping("/requests/{registrationToken}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<RequestDto> declineRequest(@PathVariable String registrationToken) {
-        Date currentDate = new Date();
-        Request request = registrationService.getByRegistrationToken(registrationToken);
+        Optional<Request> optional = registrationService.getByRegistrationToken(registrationToken);
+        if(optional.isEmpty() || optional.get().isDecisionMade()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        Request request = optional.get();
         request.setDecision(Decision.DECLINE);
-        request.setDateDecision(currentDate);
+        request.setDateDecision(new Date());
 
         registrationService.saveRequest(request);
 
-        return ResponseEntity.ok(RequestDto.mapRequest(request));
+        RequestDto requestDto = RequestDto.mapRequest(request);
+        return ResponseEntity.ok(requestDto);
     }
-
 }

@@ -1,9 +1,8 @@
-package com.registrationservice.model;
+package com.registrationservice.model.user;
 
+import com.registrationservice.model.request.Request;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -22,23 +21,24 @@ public class User {
     private String password;
     @Column(name = "status")
     @Enumerated(EnumType.STRING)
-    private Decision status;
+    private Status status;
     @Column(name = "role")
     @Enumerated(EnumType.STRING)
     private Role role;
-    @CreatedDate
-    @Column(name = "date_request")
-    private Date dateRequest;
-    @LastModifiedDate
     @Column(name = "date_decision")
     private Date dateDecision;
 
-    public User(String email, String password, Decision status, Role role, Date dateRequest, Date dateDecision) {
+    public User(String email, String password, Date dateDecision) {
         this.email = email;
         this.password = password;
-        this.status = status;
-        this.role = role;
-        this.dateRequest = dateRequest;
         this.dateDecision = dateDecision;
+    }
+
+    public static User mapToUser (Request request) {
+        return new User(
+                request.getEmail(),
+                request.getPassword(),
+                request.getDateDecision()
+        );
     }
 }

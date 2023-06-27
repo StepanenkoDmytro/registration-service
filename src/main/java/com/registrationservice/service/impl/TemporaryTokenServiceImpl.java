@@ -1,39 +1,43 @@
-package com.registrationservice.security;
+package com.registrationservice.service.impl;
 
-import com.registrationservice.security.TokenAuthenticationException;
+import com.registrationservice.service.TemporaryTokenService;
 import io.jsonwebtoken.*;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.Random;
 
 @Service
-public class TemporaryTokenService {
-    private final String SECRET_KEY = "FAjhjkhf13124718975981kjhgksfsFA123";
-//    private final long validityInMilliseconds;
-//
-//    public TemporaryTokenService(long validityInMilliseconds) {
-//        this.validityInMilliseconds = validityInMilliseconds;
-//    }
+@PropertySource("classpath:token.properties")
+public class TemporaryTokenServiceImpl implements TemporaryTokenService {
+    private final String secretKey;
+    private final long validityInMilliseconds;
+
+    public TemporaryTokenServiceImpl(@Value("${secret_key}") String secretKey, @Value("${validity_milliseconds}") long validityInMilliseconds) {
+        this.secretKey = secretKey;
+        this.validityInMilliseconds = validityInMilliseconds;
+    }
 
     public String createToken() {
         Date now = new Date();
-        Date expirationDate = new Date(now.getTime() + 300_000);
+        Date expirationDate = new Date(now.getTime() + validityInMilliseconds);
         String userID = generateUserID();
         return Jwts.builder()
                 .claim("userID", userID)
                 .setIssuedAt(now)
                 .setExpiration(expirationDate)
-                .signWith(SignatureAlgorithm.HS256, SECRET_KEY)
+                .signWith(SignatureAlgorithm.HS256, secretKey)
                 .compact();
     }
 
     public boolean isValidateToken(String token){
         try {
-            Jws<Claims> claims = Jwts.parser().setSigningKey(SECRET_KEY).parseClaimsJws(token);
+            Jws<Claims> claims = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);
             return !claims.getBody().getExpiration().before(new Date());
         } catch (JwtException | IllegalArgumentException e) {
-            throw new TokenAuthenticationException("Token is expired or invalid");
+            return false;
         }
     }
 

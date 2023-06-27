@@ -1,7 +1,7 @@
 package com.registrationservice.service.impl;
 
 import com.registrationservice.dto.RequestDto;
-import com.registrationservice.model.Request;
+import com.registrationservice.model.request.Request;
 import com.registrationservice.repository.RequestRepository;
 import com.registrationservice.service.RegistrationRequestsService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,13 +36,8 @@ public class RegistrationRequestsServiceImpl implements RegistrationRequestsServ
     }
 
     @Override
-    public Request getByRegistrationToken(String token) {
-        Optional<Request> viewer = requestRepository.findByRegistrationToken(token);
-        if (viewer.isEmpty()) {
-            throw new RuntimeException("token is invalid");
-        }
-
-        return viewer.get();
+    public Optional<Request> getByRegistrationToken(String token) {
+        return requestRepository.findByRegistrationToken(token);
     }
 
     @Override

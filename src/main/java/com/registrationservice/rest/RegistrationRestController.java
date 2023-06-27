@@ -1,25 +1,18 @@
 package com.registrationservice.rest;
 
+import com.registrationservice.dto.HelloResponse;
 import com.registrationservice.dto.SignUpDto;
 import com.registrationservice.dto.RequestDto;
-import com.registrationservice.model.Request;
-import com.registrationservice.model.Decision;
-import com.registrationservice.model.Role;
-import com.registrationservice.model.User;
-import com.registrationservice.repository.UserRepository;
-import com.registrationservice.security.TemporaryTokenService;
+import com.registrationservice.model.request.Request;
+import com.registrationservice.service.TemporaryTokenService;
 import com.registrationservice.service.RegistrationRequestsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -27,52 +20,58 @@ import java.util.Optional;
 public class RegistrationRestController {
     private final TemporaryTokenService tokenService;
     private final RegistrationRequestsService requestsService;
-    private final UserRepository userRepository;
 
     @Autowired
-    public RegistrationRestController(TemporaryTokenService tokenService, RegistrationRequestsService requestsService,
-                                      UserRepository userRepository) {
+    public RegistrationRestController(TemporaryTokenService tokenService, RegistrationRequestsService requestsService) {
         this.tokenService = tokenService;
         this.requestsService = requestsService;
-        this.userRepository = userRepository;
     }
 
     @PostMapping("")
-    public ResponseEntity registration(@RequestBody SignUpDto newRequest) {
-        //Need refactor
-        if(!tokenService.isValidateToken(newRequest.getRegistrationToken())) {
-            return ResponseEntity.badRequest().body(HttpStatus.BAD_REQUEST);
+    public ResponseEntity<RequestDto> registration(@RequestBody SignUpDto newRequest) {
+        String registrationToken = newRequest.getRegistrationToken();
+        if (registrationToken == null || !tokenService.isValidateToken(registrationToken)) {
+            return ResponseEntity.notFound().build();
         }
 
-        Request request = new Request(
-                newRequest.getUserEmail(),
-                newRequest.getPassword(),
-                newRequest.getRegistrationToken(),
-                Decision.WAITING,
-                new Date());
+        Request request = Request.mapToRequest(newRequest);
 
         requestsService.saveRequest(request);
-        return ResponseEntity.ok(request);
+        RequestDto requestDto = RequestDto.mapRequest(request);
+        return ResponseEntity.ok(requestDto);
     }
 
     @GetMapping("{registrationToken}")
     public ResponseEntity<RequestDto> checkDecision(@PathVariable String registrationToken) {
-        //Need create
-        Request request = requestsService.getByRegistrationToken(registrationToken);
-        return ResponseEntity.ok(RequestDto.mapRequest(request));
+        Optional<Request> optional = requestsService.getByRegistrationToken(registrationToken);
+        if (optional.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        RequestDto requestDto = RequestDto.mapRequest(optional.get());
+        return ResponseEntity.ok(requestDto);
     }
 
     @GetMapping("/test")
-    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
-    public ResponseEntity<Object> testAuth(@AuthenticationPrincipal UserDetails userDetails) {
-        String username = userDetails.getUsername();
-        User user = userRepository.findByEmail(username).get();
-        Map<String, String> response = new HashMap<>();
-        if(user.getRole().equals(Role.ROLE_ADMIN)) {
-            response.put("message", "Hello, ADMIN");
-        } else {
-            response.put("message", "Hello, " + username);
+    public ResponseEntity<HelloResponse> testAuth(@AuthenticationPrincipal UserDetails userDetails) {
+        if (userDetails == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
+
+        HelloResponse response;
+        if ( isAdmin(userDetails) ) {
+            response = new HelloResponse("ADMIN");
+        } else {
+            String username = userDetails.getUsername();
+            response = new HelloResponse(username);
+        }
+
         return ResponseEntity.ok().body(response);
+    }
+
+    private boolean isAdmin(UserDetails userDetails) {
+        return userDetails.getAuthorities()
+                .stream()
+                .anyMatch(authority -> authority.getAuthority().equals("ROLE_ADMIN"));
     }
 }

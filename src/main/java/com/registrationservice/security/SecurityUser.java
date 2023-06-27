@@ -1,8 +1,8 @@
 package com.registrationservice.security;
 
-import com.registrationservice.model.Decision;
-import com.registrationservice.model.Role;
-import com.registrationservice.model.User;
+import com.registrationservice.model.user.Role;
+import com.registrationservice.model.user.Status;
+import com.registrationservice.model.user.User;
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -65,18 +65,14 @@ public class SecurityUser implements UserDetails {
     public static UserDetails fromUser(User user) {
         return new org.springframework.security.core.userdetails.User(
                 user.getEmail(), user.getPassword(),
-                true,
-                true,
-                true,
-                true,
+                user.getStatus().equals(Status.ACTIVE),
+                user.getStatus().equals(Status.ACTIVE),
+                user.getStatus().equals(Status.ACTIVE),
+                user.getStatus().equals(Status.ACTIVE),
                 mapToGrantedAuthorities(user.getRole())
         );
     }
     public static List<SimpleGrantedAuthority> mapToGrantedAuthorities(Role userRoles){
         return Collections.singletonList(new SimpleGrantedAuthority(userRoles.name()));
-//                userRoles.stream()
-//                .map(role ->
-//                        new SimpleGrantedAuthority(role.getName())
-//                ).collect(Collectors.toList());
     }
 }

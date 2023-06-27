@@ -1,9 +1,8 @@
 package com.registrationservice.service.impl;
 
-import com.registrationservice.exception.UserFetchException;
-import com.registrationservice.model.Decision;
-import com.registrationservice.model.Role;
-import com.registrationservice.model.User;
+import com.registrationservice.model.user.Role;
+import com.registrationservice.model.user.Status;
+import com.registrationservice.model.user.User;
 import com.registrationservice.repository.UserRepository;
 import com.registrationservice.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,15 +20,10 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User getUserByEmail(String email) {
-        return userRepository.findByEmail(email).orElseThrow(() ->
-                new UserFetchException(String.format("User with email = %s not found", email)));
-    }
-
-    @Override
     public void userRegistration(User user) {
-
         user.setRole(Role.ROLE_USER);
+        user.setStatus(Status.ACTIVE);
+
         user.setPassword(passwordEncoder().encode(user.getPassword()));
         userRepository.save(user);
     }

@@ -1,4 +1,4 @@
-package com.registrationservice.model;
+package com.registrationservice.model.request;
 
 public enum Decision {
     ACCEPT, WAITING, DECLINE

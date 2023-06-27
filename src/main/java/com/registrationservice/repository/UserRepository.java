@@ -1,6 +1,6 @@
 package com.registrationservice.repository;
 
-import com.registrationservice.model.User;
+import com.registrationservice.model.user.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

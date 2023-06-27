@@ -1,6 +1,6 @@
 package com.registrationservice.repository;
 
-import com.registrationservice.model.Request;
+import com.registrationservice.model.request.Request;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 

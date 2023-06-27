@@ -1,6 +1,6 @@
 package com.registrationservice.dto;
 
-import com.registrationservice.model.Request;
+import com.registrationservice.model.request.Request;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 

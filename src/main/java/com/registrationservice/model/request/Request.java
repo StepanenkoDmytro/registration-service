@@ -1,5 +1,6 @@
-package com.registrationservice.model;
+package com.registrationservice.model.request;
 
+import com.registrationservice.dto.SignUpDto;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
@@ -38,5 +39,21 @@ public class Request {
         this.registrationToken = registrationToken;
         this.decision = decision;
         this.dateRequest = dateRequest;
+    }
+
+    public static Request mapToRequest(SignUpDto request) {
+        return new Request(
+                request.getUserEmail(),
+                request.getPassword(),
+                request.getRegistrationToken(),
+                Decision.WAITING,
+                new Date()
+        );
+    }
+
+    public boolean isDecisionMade () {
+        boolean isAccept = this.getDecision().equals(Decision.ACCEPT);
+        boolean isDecline = this.getDecision().equals(Decision.DECLINE);
+        return isAccept || isDecline;
     }
 }
