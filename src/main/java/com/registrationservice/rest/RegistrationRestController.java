@@ -13,6 +13,8 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.ConstraintViolationException;
+import javax.validation.Valid;
 import java.util.Optional;
 
 @RestController
@@ -28,17 +30,21 @@ public class RegistrationRestController {
     }
 
     @PostMapping("")
-    public ResponseEntity<RequestDto> registration(@RequestBody SignUpDto newRequest) {
-        String registrationToken = newRequest.getRegistrationToken();
-        if (registrationToken == null || !tokenService.isValidateToken(registrationToken)) {
-            return ResponseEntity.notFound().build();
+    public ResponseEntity<RequestDto> registration(@Valid @RequestBody SignUpDto newRequest) {
+        try {
+            String registrationToken = newRequest.getRegistrationToken();
+            if (!tokenService.isValidateToken(registrationToken)) {
+                return ResponseEntity.notFound().build();
+            }
+
+            Request request = Request.mapToRequest(newRequest);
+
+            requestsService.saveRequest(request);
+            RequestDto requestDto = RequestDto.mapRequest(request);
+            return ResponseEntity.ok(requestDto);
+        } catch (ConstraintViolationException e) {
+            return ResponseEntity.badRequest().build();
         }
-
-        Request request = Request.mapToRequest(newRequest);
-
-        requestsService.saveRequest(request);
-        RequestDto requestDto = RequestDto.mapRequest(request);
-        return ResponseEntity.ok(requestDto);
     }
 
     @GetMapping("{registrationToken}")

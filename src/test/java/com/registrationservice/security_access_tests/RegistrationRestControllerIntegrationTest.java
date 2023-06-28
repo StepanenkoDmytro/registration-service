@@ -1,7 +1,6 @@
 package com.registrationservice.security_access_tests;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.registrationservice.dto.SignInDto;
 import com.registrationservice.dto.SignUpDto;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +13,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 @SpringBootTest
 @AutoConfigureMockMvc
-class RegistrationAndAuthRestControllerIntegrationTest {
+class RegistrationRestControllerIntegrationTest {
     @Autowired
     private MockMvc mockMvc;
 
@@ -40,16 +39,5 @@ class RegistrationAndAuthRestControllerIntegrationTest {
     void testRegistration_WithAnonymous() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get("/registration/test"))
                 .andExpect(MockMvcResultMatchers.status().isUnauthorized());
-    }
-
-    @Test
-    void authTest_WithAnonymous() throws Exception {
-        SignInDto test = new SignInDto("test@", "test");
-        ObjectMapper objectMapper = new ObjectMapper();
-        String requestBody = objectMapper.writeValueAsString(test);
-        mockMvc.perform(MockMvcRequestBuilders.post("/login")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(requestBody))
-                .andExpect(MockMvcResultMatchers.status().isForbidden());
     }
 }

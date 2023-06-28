@@ -29,7 +29,6 @@ class RegistrationRestControllerTest {
     void registrationValidTokenReturnsOk() {
         SignUpDto signUpDto = new SignUpDto("valid-token" ,"test@test.com", "test");
         when(tokenService.isValidateToken("valid-token")).thenReturn(true);
-
         ResponseEntity<RequestDto> response = registrationRestController.registration(signUpDto);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
@@ -44,7 +43,6 @@ class RegistrationRestControllerTest {
     void registrationInvalidTokenReturnsNotFound() {
         SignUpDto signUpDto = new SignUpDto("invalid-token" ,"test@test.com", "test");
         when(tokenService.isValidateToken("invalid-token")).thenReturn(false);
-
         ResponseEntity<RequestDto> response = registrationRestController.registration(signUpDto);
 
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
@@ -56,7 +54,6 @@ class RegistrationRestControllerTest {
     @Test
     void registrationTokenIsNullReturnsNotFound() {
         SignUpDto signUpDto = new SignUpDto(null ,"test@test.com", "test");
-
         ResponseEntity<RequestDto> response = registrationRestController.registration(signUpDto);
 
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());

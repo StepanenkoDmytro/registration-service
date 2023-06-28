@@ -121,19 +121,6 @@ Creates a new registration token.
 
 ## User endpoints
 
-### Authentication
-
-`POST /login`
-
-#### Request
-
-- Request Body: JSON object with the `email` and `password` fields.
-
-#### Response
-
-- Status Code: 200 OK if the authentication is successful
-- Status Code: 401 Unauthorized if the authentication fails
-
 ### Verifies the authentication status and role of the user.
 
 `GET /registration/test`

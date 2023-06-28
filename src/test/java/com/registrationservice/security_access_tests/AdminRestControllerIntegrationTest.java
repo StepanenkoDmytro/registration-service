@@ -55,7 +55,7 @@ class AdminRestControllerIntegrationTest {
     @Test
     void createRegistrationTokenTest_WithAnonymous() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.post("/registration/requests"))
-                .andExpect(MockMvcResultMatchers.status().isForbidden());
+                .andExpect(MockMvcResultMatchers.status().isUnauthorized());
     }
 
     @Test
@@ -75,7 +75,7 @@ class AdminRestControllerIntegrationTest {
     @Test
     void getWaitingRequestsTest_WithAnonymous() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get("/registration/requests"))
-                .andExpect(MockMvcResultMatchers.status().isForbidden());
+                .andExpect(MockMvcResultMatchers.status().isUnauthorized());
     }
 
     @Test
@@ -95,7 +95,7 @@ class AdminRestControllerIntegrationTest {
     @Test
     void getAllTest_WithAnonymous() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get("/registration/requests/all"))
-                .andExpect(MockMvcResultMatchers.status().isForbidden());
+                .andExpect(MockMvcResultMatchers.status().isUnauthorized());
     }
 
     @Test
@@ -120,7 +120,7 @@ class AdminRestControllerIntegrationTest {
     @Test
     void getRequestTest_WithAnonymous() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get("/registration/requests/some-token"))
-                .andExpect(MockMvcResultMatchers.status().isForbidden())
+                .andExpect(MockMvcResultMatchers.status().isUnauthorized())
                 .andReturn();
     }
 
@@ -146,7 +146,7 @@ class AdminRestControllerIntegrationTest {
     @Test
     void acceptRequestTest_WithAnonymous() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.put("/registration/requests/some-token"))
-                .andExpect(MockMvcResultMatchers.status().isForbidden())
+                .andExpect(MockMvcResultMatchers.status().isUnauthorized())
                 .andReturn();
     }
 
@@ -172,7 +172,7 @@ class AdminRestControllerIntegrationTest {
     @Test
     void declineRequestTest_WithAnonymous() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.delete("/registration/requests/some-token"))
-                .andExpect(MockMvcResultMatchers.status().isForbidden())
+                .andExpect(MockMvcResultMatchers.status().isUnauthorized())
                 .andReturn();
     }
 
