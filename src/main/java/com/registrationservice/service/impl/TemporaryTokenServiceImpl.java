@@ -1,5 +1,7 @@
 package com.registrationservice.service.impl;
 
+import com.registrationservice.model.request.Request;
+import com.registrationservice.repository.RequestRepository;
 import com.registrationservice.service.TemporaryTokenService;
 import io.jsonwebtoken.*;
 import org.springframework.beans.factory.annotation.Value;
@@ -7,6 +9,7 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.Optional;
 import java.util.Random;
 
 @Service
@@ -14,10 +17,12 @@ import java.util.Random;
 public class TemporaryTokenServiceImpl implements TemporaryTokenService {
     private final String secretKey;
     private final long validityInMilliseconds;
+    private final RequestRepository requestRepository;
 
-    public TemporaryTokenServiceImpl(@Value("${secret_key}") String secretKey, @Value("${validity_milliseconds}") long validityInMilliseconds) {
+    public TemporaryTokenServiceImpl(@Value("${secret_key}") String secretKey, @Value("${validity_milliseconds}") long validityInMilliseconds, RequestRepository requestRepository) {
         this.secretKey = secretKey;
         this.validityInMilliseconds = validityInMilliseconds;
+        this.requestRepository = requestRepository;
     }
 
     public String createToken() {
@@ -39,6 +44,12 @@ public class TemporaryTokenServiceImpl implements TemporaryTokenService {
         } catch (JwtException | IllegalArgumentException e) {
             return false;
         }
+    }
+
+    @Override
+    public boolean isTokenAlreadyUsed(String token) {
+        Optional<Request> optionalRequest = requestRepository.findByRegistrationToken(token);
+        return optionalRequest.isPresent();
     }
 
     private String generateUserID() {

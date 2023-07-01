@@ -27,7 +27,7 @@ class RegistrationRestControllerTest {
 
     @Test
     void registrationValidTokenReturnsOk() {
-        SignUpDto signUpDto = new SignUpDto("valid-token" ,"test@test.com", "test");
+        SignUpDto signUpDto = new SignUpDto("valid-token","test@test.com", "test");
         when(tokenService.isValidateToken("valid-token")).thenReturn(true);
         ResponseEntity<RequestDto> response = registrationRestController.registration(signUpDto);
 
@@ -53,10 +53,24 @@ class RegistrationRestControllerTest {
 
     @Test
     void registrationTokenIsNullReturnsNotFound() {
-        SignUpDto signUpDto = new SignUpDto(null ,"test@test.com", "test");
+        SignUpDto signUpDto = new SignUpDto(null,"test@test.com", "test");
         ResponseEntity<RequestDto> response = registrationRestController.registration(signUpDto);
 
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        assertNull(response.getBody());
+
+        verify(requestsService, never()).saveRequest(any());
+    }
+
+    @Test
+    void registrationTokenValidEmailExist() {
+        SignUpDto signUpDto = new SignUpDto("valid-token","test@test.com", "test");
+        when(tokenService.isValidateToken("valid-token")).thenReturn(true);
+        when(tokenService.isTokenAlreadyUsed("valid-token")).thenReturn(true);
+
+        ResponseEntity<RequestDto> response = registrationRestController.registration(signUpDto);
+
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
         assertNull(response.getBody());
 
         verify(requestsService, never()).saveRequest(any());

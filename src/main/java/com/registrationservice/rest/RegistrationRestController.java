@@ -37,6 +37,9 @@ public class RegistrationRestController {
                 return ResponseEntity.notFound().build();
             }
 
+            if(tokenService.isTokenAlreadyUsed(newRequest.getRegistrationToken())) {
+                return ResponseEntity.badRequest().build();
+            }
             Request request = Request.mapToRequest(newRequest);
 
             requestsService.saveRequest(request);
